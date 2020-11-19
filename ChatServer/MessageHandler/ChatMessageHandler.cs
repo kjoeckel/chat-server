@@ -15,7 +15,7 @@ namespace ChatServer.MessageHandler
             if (user != null)
             {
                 string json = JsonSerializer.Serialize(chatMessage);
-                byte[] msg = System.Text.Encoding.ASCII.GetBytes(json);
+                byte[] msg = System.Text.Encoding.UTF8.GetBytes(json);
 
                 foreach (TcpClient remoteClient in server.GetClients())
                 {

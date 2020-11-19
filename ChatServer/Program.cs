@@ -7,14 +7,15 @@ using System.Threading;
 
 namespace ChatServer
 {
-    class Program
+    public class Program
     {
-        static void HandleClient(Server server, TcpClient client)
+        public static void HandleClient(Server server, TcpClient client)
         {
             byte[] bytes = new byte[256];
             string data;
+            bool clientIsConnected = true;
 
-            while (true)
+            while (clientIsConnected)
             {
                 NetworkStream stream = client.GetStream();
 
@@ -32,7 +33,15 @@ namespace ChatServer
 
                     IMessageHandler handler = MessageHandlerFactory.GetMessageHandler(genericMessage.MessageId);
                     handler.Execute(server, client, message);
+                //    if (message.MessageId == 3)
+                //    {
+                //        clientIsConnected = false;
+                //    }
                 }
+                //if (!clientIsConnected)
+                //{
+                //    client.Close();
+                //}
             }
         }
 

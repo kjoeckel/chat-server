@@ -10,12 +10,12 @@ namespace ChatServer.MessageHandler
         {
             ChatMessage chatMessage = message as ChatMessage;
 
-            User user = server.GetUsers().Find(u => u.SessionId == chatMessage.SessionId);
+            User user = server.GetUsers().Find(u => u.SessionIds.Contains(chatMessage.SessionId));
 
             if (user != null)
             {
                 string json = JsonSerializer.Serialize(chatMessage);
-                byte[] msg = System.Text.Encoding.UTF8.GetBytes(json);
+                byte[] msg = System.Text.Encoding.ASCII.GetBytes(json);
 
                 foreach (TcpClient remoteClient in server.GetClients())
                 {

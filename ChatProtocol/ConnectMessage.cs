@@ -1,14 +1,10 @@
-﻿using System;
-
-namespace ChatProtocol
+﻿namespace ChatProtocol
 {
     public class ConnectMessage : IMessage
     {
         public string ServerPassword { get; set; }
-        public string UserName { get; set; }
+        public string Username { get; set; }
         public string Password { get; set; }
-
-        public DateTime TimeStamp { get; set; }
 
         public int MessageId
         {

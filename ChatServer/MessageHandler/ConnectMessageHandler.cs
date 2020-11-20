@@ -1,5 +1,6 @@
 ﻿using ChatProtocol;
 using System;
+using System.Linq;
 using System.Net.Sockets;
 using System.Text.Json;
 
@@ -17,17 +18,36 @@ namespace ChatServer.MessageHandler
                 authenticatedServerPassword = server.CheckPassword(connectMessage.ServerPassword);
             }
 
-            User user = server.GetUsers().Find(u => u.Username == connectMessage.UserName && u.Password == connectMessage.Password);
+            User user = server.GetUsers().Find(u => u.Username == connectMessage.Username && u.Password == connectMessage.Password);
             bool authenticatedUser = (user != null);
 
             bool authenticated = authenticatedServerPassword && authenticatedUser;
             ConnectResponseMessage connectResponseMessage = new ConnectResponseMessage();
             if (authenticated)
             {
-                user.SessionId = Guid.NewGuid().ToString();
-                connectResponseMessage.SessionId = user.SessionId;
+                string sessionId = Guid.NewGuid().ToString();
+                user.SessionIds.Add(sessionId); 
+                connectResponseMessage.SessionId = sessionId;
                 server.AddClient(client);
-                Console.WriteLine($"{user.Username} Client connected.");
+                Console.WriteLine("Client connected.");
+
+                if (user.SessionIds.Count == 1)
+                {
+                    // Send user count to all clients (broadcast)
+                    UserCountMessage userCountMessage = new UserCountMessage
+                    {
+                        UserCount = server.GetUsers().Count,
+                        UserOnlineCount = server.GetUsers().Count(u => u.SessionIds.Count > 0)
+                    };
+
+                    string userCountMessageJson = JsonSerializer.Serialize(userCountMessage);
+                    byte[] userCountMessageBytes = System.Text.Encoding.UTF8.GetBytes(userCountMessageJson);
+
+                    foreach (TcpClient remoteClient in server.GetClients())
+                    {
+                        remoteClient.GetStream().Write(userCountMessageBytes, 0, userCountMessageBytes.Length);
+                    }
+                }
             }
 
             connectResponseMessage.Success = authenticated;

@@ -7,40 +7,32 @@ using System.Threading;
 
 namespace ChatServer
 {
-    public class Program
+    class Program
     {
-        public static void HandleClient(Server server, TcpClient client)
+        static void HandleClient(Server server, TcpClient client)
         {
             byte[] bytes = new byte[256];
-            bool clientIsConnected = true;
+            string data;
 
-            while (clientIsConnected)
+            while (true)
             {
                 NetworkStream stream = client.GetStream();
 
-                int jsonDataLength;
+                int i;
 
-                while ((jsonDataLength = stream.Read(bytes, 0, bytes.Length)) != 0)
+                while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
                 {
-                    string jsonData = System.Text.Encoding.UTF8.GetString(bytes, 0, jsonDataLength);
+                    data = System.Text.Encoding.UTF8.GetString(bytes, 0, i);
 
                     // Verschlüsselung: data entschlüsseln
-                    GenericMessage genericMessage = JsonSerializer.Deserialize<GenericMessage>(jsonData);
-                    IMessage message = MessageFactory.GetMessage(genericMessage.MessageId, jsonData);
+
+                    GenericMessage genericMessage = JsonSerializer.Deserialize<GenericMessage>(data);
+
+                    IMessage message = MessageFactory.GetMessage(genericMessage.MessageId, data);
 
                     IMessageHandler handler = MessageHandlerFactory.GetMessageHandler(genericMessage.MessageId);
                     handler.Execute(server, client, message);
-
-                    if (message.MessageId == 3)
-                    {
-                        DisconnectMessageHandler disconnectMessageHandler = handler as DisconnectMessageHandler;
-                        clientIsConnected = disconnectMessageHandler.IsClientConnected;
-                    }
                 }
-                //if (!clientIsConnected)
-                //{
-                //    client.Close();
-                //}
             }
         }
 
@@ -62,7 +54,6 @@ namespace ChatServer
 
                     Thread thread = new Thread(() => HandleClient(server, client));
                     thread.Start();
-                    client.Close();
                 }
             }
             catch (SocketException e)

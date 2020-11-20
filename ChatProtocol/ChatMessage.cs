@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ChatProtocol
+﻿namespace ChatProtocol
 {
     public class ChatMessage : IMessage
     {
@@ -15,8 +13,5 @@ namespace ChatProtocol
             }
             set { }
         }
-
-        public string UserName { get; set; }
-        public DateTime TimeStamp { get; set; }
     }
 }

@@ -4,6 +4,7 @@
     {
         public int UserCount { get; set; }
         public int UserOnlineCount { get; set; }
+        public string UserName { get; set; }
 
         public int MessageId
         {

@@ -26,7 +26,7 @@ namespace ChatServer.MessageHandler
             if (authenticated)
             {
                 string sessionId = Guid.NewGuid().ToString();
-                user.SessionIds.Add(sessionId); 
+                user.SessionIds.Add(sessionId);
                 connectResponseMessage.SessionId = sessionId;
                 server.AddClient(client);
                 Console.WriteLine("Client connected.");
@@ -37,7 +37,8 @@ namespace ChatServer.MessageHandler
                     UserCountMessage userCountMessage = new UserCountMessage
                     {
                         UserCount = server.GetUsers().Count,
-                        UserOnlineCount = server.GetUsers().Count(u => u.SessionIds.Count > 0)
+                        UserOnlineCount = server.GetUsers().Count(u => u.SessionIds.Count > 0),
+                        UserName = user.Username
                     };
 
                     string userCountMessageJson = JsonSerializer.Serialize(userCountMessage);

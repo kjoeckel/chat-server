@@ -17,7 +17,7 @@ namespace ChatServer.MessageHandler
                 authenticatedServerPassword = server.CheckPassword(connectMessage.ServerPassword);
             }
 
-            User user = server.GetUsers().Find(u => u.Username == connectMessage.Username && u.Password == connectMessage.Password);
+            User user = server.GetUsers().Find(u => u.Username == connectMessage.UserName && u.Password == connectMessage.Password);
             bool authenticatedUser = (user != null);
 
             bool authenticated = authenticatedServerPassword && authenticatedUser;
@@ -27,7 +27,7 @@ namespace ChatServer.MessageHandler
                 user.SessionId = Guid.NewGuid().ToString();
                 connectResponseMessage.SessionId = user.SessionId;
                 server.AddClient(client);
-                Console.WriteLine("Client connected.");
+                Console.WriteLine($"{user.Username} Client connected.");
             }
 
             connectResponseMessage.Success = authenticated;

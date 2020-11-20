@@ -7,11 +7,14 @@ namespace ChatServer.MessageHandler
 
     public class DisconnectMessageHandler : IMessageHandler
     {
+        public bool IsClientConnected = true;
+
         public void Execute(Server server, TcpClient client, IMessage message)
         {
             DisconnectMessage disconnectMessage = message as DisconnectMessage;
-            Console.WriteLine($"Disconnecting");
-            
+            IsClientConnected = false;
+
+            Console.WriteLine($"{disconnectMessage.SessionId} Disconnecting");
         }
     }
 

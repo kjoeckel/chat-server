@@ -1,5 +1,6 @@
 ﻿using ChatProtocol;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text.Json;
@@ -33,12 +34,13 @@ namespace ChatServer.MessageHandler
 
                 if (user.SessionIds.Count == 1)
                 {
+
                     // Send user count to all clients (broadcast)
                     UserCountMessage userCountMessage = new UserCountMessage
                     {
                         UserCount = server.GetUsers().Count,
                         UserOnlineCount = server.GetUsers().Count(u => u.SessionIds.Count > 0),
-                        UserName = user.Username
+                        UserNames = server.GetOnlineUserNames()
                     };
 
                     string userCountMessageJson = JsonSerializer.Serialize(userCountMessage);

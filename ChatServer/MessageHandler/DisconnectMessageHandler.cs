@@ -24,7 +24,8 @@ namespace ChatServer.MessageHandler
                     UserCountMessage userCountMessage = new UserCountMessage
                     {
                         UserCount = server.GetUsers().Count,
-                        UserOnlineCount = server.GetUsers().Count(u => u.SessionIds.Count > 0)
+                        UserOnlineCount = server.GetUsers().Count(u => u.SessionIds.Count > 0),
+                        UserNames = server.GetOnlineUserNames()
                     };
 
                     string userCountMessageJson = JsonSerializer.Serialize(userCountMessage);

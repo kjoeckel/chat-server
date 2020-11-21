@@ -82,6 +82,19 @@ namespace ChatServer
             return users;
         }
 
+        public List<string> GetOnlineUserNames()
+        {
+            List<string> usernames = new List<string>();
+            foreach (User u in GetUsers())
+            {
+                if (u.SessionIds.Count > 0)
+                {
+                    usernames.Add(u.Username);
+                }
+            }
+            return usernames;
+        }
+
         public TcpClient AcceptTcpClient()
         {
             return tcpListener.AcceptTcpClient();

@@ -6,6 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="DryIoc.dll" Version="4.5.1" />
+    <PackageReference Include="morelinq" Version="3.3.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\ChatProtocol\ChatProtocol.csproj" />
   </ItemGroup>
 

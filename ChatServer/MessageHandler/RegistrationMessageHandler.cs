@@ -1,29 +1,42 @@
 ﻿using ChatProtocol;
+using MoreLinq;
+using MoreLinq.Extensions;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text.Json;
 
 namespace ChatServer.MessageHandler
 {
-    public class ConnectMessageHandler : IMessageHandler
+    class RegistrationMessageHandler : IMessageHandler
     {
         public void Execute(Server server, TcpClient client, IMessage message)
         {
-            var connectMessage = message as ConnectMessage;
+            var registrationMessage = message as RegistrationMessage;
 
             bool authenticatedServerPassword = true;
             if (server.HasPassword())
             {
-                authenticatedServerPassword = server.CheckPassword(connectMessage.ServerPassword);
+                authenticatedServerPassword = server.CheckPassword(registrationMessage.ServerPassword);
             }
+            var tmpUserList = server.GetUsers();
+            int newId = (tmpUserList.Select(x => x.Id).Max()) + 1;
+            var user = new User()
+            {
+                Username = registrationMessage.Username,
+                Password = registrationMessage.Password,
+                Id = newId
+            };
 
-            var user = server.GetUsers().Find(u => u.Username == connectMessage.Username && u.Password == connectMessage.Password);
-            bool authenticatedUser = (user != null);
+            server.AddUsers(user);
+            string userJson = JsonSerializer.Serialize(server.GetUsers());
+            File.WriteAllText("users.json", userJson);
+            bool authenticatedUser = true;
 
             bool authenticated = authenticatedServerPassword && authenticatedUser;
-            var connectResponseMessage = new ConnectResponseMessage();
+            ConnectResponseMessage connectResponseMessage = new ConnectResponseMessage();
             if (authenticated)
             {
                 string sessionId = Guid.NewGuid().ToString();
@@ -58,6 +71,17 @@ namespace ChatServer.MessageHandler
             string json = JsonSerializer.Serialize(connectResponseMessage);
             byte[] msg = System.Text.Encoding.UTF8.GetBytes(json);
             client.GetStream().Write(msg, 0, msg.Length);
+
+            var registrationResponseMessage = new RegistrationResponseMessage();
+
+            foreach (User usr in server.GetUsers())
+            {
+                registrationResponseMessage.Users.Add(new ChatProtocol.User(usr.Id, usr.Username));
+            }
+
+            string jsonReg = JsonSerializer.Serialize(registrationResponseMessage);
+            byte[] regMsg = System.Text.Encoding.UTF8.GetBytes(jsonReg);
+            client.GetStream().Write(regMsg, 0, regMsg.Length);
         }
     }
 }

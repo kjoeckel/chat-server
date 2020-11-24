@@ -9,9 +9,9 @@ namespace ChatServer.MessageHandler
     {
         public void Execute(Server server, TcpClient client, IMessage message)
         {
-            DisconnectMessage disconnectMessage = message as DisconnectMessage;
+           var disconnectMessage = message as DisconnectMessage;
 
-            User user = server.GetUsers().Find(u => u.SessionIds.Contains(disconnectMessage.SessionId));
+           var user = server.GetUsers().Find(u => u.SessionIds.Contains(disconnectMessage.SessionId));
 
             if(user != null)
             {
